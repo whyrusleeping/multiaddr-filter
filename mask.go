@@ -10,6 +10,11 @@ var ErrInvalidFormat = errors.New("invalid multiaddr-filter format")
 
 func NewMask(a string) (*net.IPNet, error) {
 	parts := strings.Split(a, "/")
+
+	if parts[0] != "" {
+		return nil, ErrInvalidFormat
+	}
+
 	if len(parts) != 5 {
 		return nil, ErrInvalidFormat
 	}

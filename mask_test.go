@@ -48,6 +48,7 @@ func TestInvalidMasks(t *testing.T) {
 		"/ip4/1.2.3.4/cidr/24",
 		"/ip6/fe80::/cidr/24",
 		"/eth/aa:aa:aa:aa:aa/ipcidr/24",
+		"foobar/ip4/1.2.3.4/ipcidr/32",
 	}
 
 	for _, s := range testCases {
