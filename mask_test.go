@@ -72,3 +72,61 @@ func TestInvalidMasks(t *testing.T) {
 	}
 
 }
+
+func TestFiltered(t *testing.T) {
+	var tests = map[string]map[string]bool{
+		"/ip4/10.0.0.0/ipcidr/8": map[string]bool{
+			"10.3.3.4":   true,
+			"10.3.4.4":   true,
+			"10.4.4.4":   true,
+			"15.52.34.3": false,
+		},
+		"/ip4/192.168.0.0/ipcidr/16": map[string]bool{
+			"192.168.0.0": true,
+			"192.168.1.0": true,
+			"192.1.0.0":   false,
+			"10.4.4.4":    false,
+		},
+	}
+
+	for mask, set := range tests {
+		m, err := NewMask(mask)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for addr, val := range set {
+			ip := net.ParseIP(addr)
+			if m.Contains(ip) != val {
+				t.Fatalf("expected contains(%s, %s) == %s", mask, addr, val)
+			}
+		}
+	}
+}
+
+func TestParsing(t *testing.T) {
+	var addrs = map[string]string{
+		"/ip4/192.168.0.0/ipcidr/16": "192.168.0.0/16",
+		"/ip4/192.0.0.0/ipcidr/8":    "192.0.0.0/8",
+		"/ip6/2001:db8::/ipcidr/32":  "2001:db8::/32",
+	}
+
+	for k, v := range addrs {
+		m, err := NewMask(k)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if m.String() != v {
+			t.Fatalf("mask is wrong: ", m, v)
+		}
+
+		orig, err := ConvertIPNet(m)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if orig != k {
+			t.Fatal("backwards conversion failed: ", orig, k)
+		}
+	}
+}
