@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net"
 	"strings"
-
-	manet "github.com/jbenet/go-multiaddr-net"
 )
 
 var ErrInvalidFormat = errors.New("invalid multiaddr-filter format")
@@ -37,11 +35,13 @@ func NewMask(a string) (*net.IPNet, error) {
 }
 
 func ConvertIPNet(n *net.IPNet) (string, error) {
-	addr, err := manet.FromIP(n.IP)
-	if err != nil {
-		return "", err
-	}
-
 	b, _ := n.Mask.Size()
-	return fmt.Sprintf("%s/ipcidr/%d", addr, b), nil
+	switch {
+	case n.IP.To4() != nil:
+		return fmt.Sprintf("/ip4/%s/ipcidr/%d", n.IP, b), nil
+	case n.IP.To16() != nil:
+		return fmt.Sprintf("/ip6/%s/ipcidr/%d", n.IP, b), nil
+	default:
+		return "", fmt.Errorf("was not given valid ip addr")
+	}
 }
