@@ -10,6 +10,6 @@ It doesn't do full multiaddr parsing to save on vendoring things and perf. The `
 
 import filter "github.com/whyrusleeping/multiaddr-filter"
 
-filter.NewMask("/ip4/192.168.0.0/24") // ipv4
-filter.NewMask("/ip6/fe80::/64") // ipv6
+filter.NewMask("/ip4/192.168.0.0/ipcidr/24") // ipv4
+filter.NewMask("/ip6/fe80::/ipcidr/64") // ipv6
 ```
